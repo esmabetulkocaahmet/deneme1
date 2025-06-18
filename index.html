@@ -56,7 +56,7 @@
 <body>
 
 <!-- 🎶 Arka Plan Müziği -->
-<audio id="bg-music" autoplay loop>
+<audio id="bg-music" loop>
   <source src="AUDIO/1.mp3" type="audio/mpeg">
   Tarayıcınız ses etiketini desteklemiyor.
 </audio>
@@ -87,7 +87,7 @@
   <button class="btn" onclick="nextQuestion()">Sonraki Soru</button>
 </section>
 
-<!-- 3. Doğum Günü Finali (Video kaldırıldı, otomatik konfeti) -->
+<!-- 3. Doğum Günü Finali -->
 <section id="final" class="hidden">
   <h1>🎉 İyi ki Doğdun Şeyda! 🎉</h1>
   <p style="font-size: 1.5rem;">Seni çok seviyoruz! Nice mutlu yaşlara 💖</p>
@@ -157,10 +157,18 @@
 
   window.onload = () => {
     startSlideshow();
+
     const bg = document.getElementById('bg-music');
     bg.volume = 0.3;
+
+    // Otomatik çalma engellendiğinde, ilk tıklamada başlat
     bg.play().catch(() => {
-      document.body.addEventListener('click', () => bg.play(), { once: true });
+      function playOnUserInteraction() {
+        bg.play().then(() => {
+          document.body.removeEventListener('click', playOnUserInteraction);
+        }).catch(() => {});
+      }
+      document.body.addEventListener('click', playOnUserInteraction);
     });
   };
 
@@ -168,16 +176,19 @@
     {
       question: "Şeyda'nın en sevdiği tatlı nedir?",
       answers: ["Baklava", "Tiramisu", "Magnolia", "Tatlı olsa da yesek"],
-      correct: 3, 
-
+      correct: 3,
+    },
+    {
       question: "Grubun adı neden 'Arnavutköy Yolcusu Kalmasın'?",
       answers: ["Arnavutköy tarihi bir yer olduğu için", "Şeyda Karhan orda oturduğu için", "Grup üyelerinin toplanma yeri olduğu için", "Şeydayı çok seven grubun diğer üyeleri tüm zorluklara rağmen Şeydayı görmeye Arnavutköye gittikleri için"],
       correct: 3,
-
+    },
+    {
       question: "Grup üyeleri bir türlü ne yapamazlar?",
       answers: ["Tüm uğraşmalara rağmen buluşamazlar", "Toplandıklarında bir türlü susamazlar", "Birbirlerinden kopamazlar", "Hepsi"],
       correct: 3,
-
+    },
+    {
       question: "Bugün neden önemli?",
       answers: ["uluslararası piknik günü olduğu için", "Şeyda Karhan Doğduğu için", "Real Madrid-Al Hilal maçı olduğu için", "Haftanın 4. günü olduğu için"],
       correct: 1,
@@ -209,7 +220,14 @@
     } else {
       document.getElementById('quiz').classList.add('hidden');
       document.getElementById('final').classList.remove('hidden');
-      showConfetti(); // 🎊 Konfetiler otomatik başlıyor
+      showConfetti();
+
+      // Arka plan müziğini durdur
+      const bg = document.getElementById('bg-music');
+      if (!bg.paused) {
+        bg.pause();
+        bg.currentTime = 0;
+      }
     }
   }
 

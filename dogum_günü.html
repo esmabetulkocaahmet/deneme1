@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>İyi ki Doğdun Şeyda! 🎉</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(45deg, #ffecb3, #f8bbd0);
+      overflow-x: hidden;
+      text-align: center;
+    }
+    section {
+      padding: 20px;
+    }
+    .hidden { display: none; }
+    .btn {
+      padding: 10px 20px;
+      font-size: 1.2em;
+      background: #ff4081;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px;
+    }
+    .gallery img, .gallery video {
+      width: 90%;
+      max-width: 500px;
+      margin: 10px auto;
+      border-radius: 10px;
+    }
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    /* Yazı animasyonu */
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    #final h1 {
+      font-size: 3rem;
+      margin-top: 100px;
+      animation: bounce 2s infinite;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 🎶 Arka Plan Müziği -->
+<audio id="bg-music" autoplay loop>
+  <source src="AUDIO/1.mp3" type="audio/mpeg">
+  Tarayıcınız ses etiketini desteklemiyor.
+</audio>
+
+<!-- 1. Fotoğraf/Video Slayt -->
+<section id="slideshow">
+  <h1>🎈 Hoş geldin Şeyda! 🎈</h1>
+  <div class="gallery">
+    <img src="images/1.jpg" class="slide">
+    <img src="images/2.jpg" class="slide hidden">
+    <img src="images/3.jpg" class="slide hidden">
+    <img src="images/4.JPEG" class="slide hidden">
+    <img src="images/5.JPEG" class="slide hidden">
+    <img src="images/6.JPEG" class="slide hidden">
+    <img src="images/7.JPEG" class="slide hidden">
+    <img src="images/8.JPEG" class="slide hidden">
+    <img src="images/9.JPEG" class="slide hidden">
+    <img src="images/11.JPEG" class="slide hidden">
+    <video class="slide hidden" controls src="video/10.MP4" autoplay muted onended="nextAutoSlide()"></video>
+  </div>
+</section>
+
+<!-- 2. Soru-Cevap Oyunu -->
+<section id="quiz" class="hidden">
+  <h2>🎁 Mini Quiz Zamanı 🎁</h2>
+  <div id="question">Soru burada olacak</div>
+  <div id="answers"></div>
+  <button class="btn" onclick="nextQuestion()">Sonraki Soru</button>
+</section>
+
+<!-- 3. Doğum Günü Finali (Video kaldırıldı, otomatik konfeti) -->
+<section id="final" class="hidden">
+  <h1>🎉 İyi ki Doğdun Şeyda! 🎉</h1>
+  <p style="font-size: 1.5rem;">Seni çok seviyoruz! Nice mutlu yaşlara 💖</p>
+</section>
+
+<!-- Konfeti Canvas -->
+<canvas class="confetti hidden" id="confetti-canvas"></canvas>
+
+<script>
+  let slides = document.querySelectorAll('.slide');
+  let currentSlide = 0;
+
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('hidden', i !== index);
+    });
+
+    const slide = slides[index];
+    if (slide.tagName === 'VIDEO') {
+      let timedOut = false;
+      const timeout = setTimeout(() => {
+        timedOut = true;
+        console.warn("Video zaman aşımına uğradı. Slayt geçiliyor...");
+        nextAutoSlide();
+      }, 6000);
+
+      slide.oncanplaythrough = () => {
+        if (!timedOut) {
+          clearTimeout(timeout);
+          slide.play();
+        }
+      };
+
+      slide.onended = nextAutoSlide;
+    }
+  }
+
+  function nextAutoSlide() {
+    currentSlide++;
+    if (currentSlide < slides.length) {
+      showSlide(currentSlide);
+    } else {
+      document.getElementById('slideshow').classList.add('hidden');
+      document.getElementById('quiz').classList.remove('hidden');
+      loadQuestion();
+    }
+  }
+
+  function startSlideshow() {
+    showSlide(currentSlide);
+    const advance = () => {
+      if (slides[currentSlide].tagName === 'VIDEO') return;
+      setTimeout(() => {
+        currentSlide++;
+        if (currentSlide < slides.length) {
+          showSlide(currentSlide);
+          advance();
+        } else {
+          document.getElementById('slideshow').classList.add('hidden');
+          document.getElementById('quiz').classList.remove('hidden');
+          loadQuestion();
+        }
+      }, 3000);
+    };
+    advance();
+  }
+
+  window.onload = () => {
+    startSlideshow();
+    const bg = document.getElementById('bg-music');
+    bg.volume = 0.3;
+    bg.play().catch(() => {
+      document.body.addEventListener('click', () => bg.play(), { once: true });
+    });
+  };
+
+  const questions = [
+    {
+      question: "Şeyda'nın en sevdiği tatlı nedir?",
+      answers: ["Baklava", "Tiramisu", "Magnolia", "Tatlı olsa da yesek"],
+      correct: 3, 
+
+      question: "Grubun adı neden 'Arnavutköy Yolcusu Kalmasın'?",
+      answers: ["Arnavutköy tarihi bir yer olduğu için", "Şeyda Karhan orda oturduğu için", "Grup üyelerinin toplanma yeri olduğu için", "Şeydayı çok seven grubun diğer üyeleri tüm zorluklara rağmen Şeydayı görmeye Arnavutköye gittikleri için"],
+      correct: 3,
+
+      question: "Grup üyeleri bir türlü ne yapamazlar?",
+      answers: ["Tüm uğraşmalara rağmen buluşamazlar", "Toplandıklarında bir türlü susamazlar", "Birbirlerinden kopamazlar", "Hepsi"],
+      correct: 3,
+
+      question: "Bugün neden önemli?",
+      answers: ["uluslararası piknik günü olduğu için", "Şeyda Karhan Doğduğu için", "Real Madrid-Al Hilal maçı olduğu için", "Haftanın 4. günü olduğu için"],
+      correct: 1,
+    }
+  ];
+
+  let currentQuestion = 0;
+
+  function loadQuestion() {
+    const q = questions[currentQuestion];
+    document.getElementById('question').innerText = q.question;
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+    q.answers.forEach((answer, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.innerText = answer;
+      btn.onclick = () => {
+        alert(i === q.correct ? "Yaaa harikasın! 🍰 Doğru cevap 🎉" : "Üzgünüm, bu değildi 🙈 ");
+      };
+      answersDiv.appendChild(btn);
+    });
+  }
+
+  function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+      loadQuestion();
+    } else {
+      document.getElementById('quiz').classList.add('hidden');
+      document.getElementById('final').classList.remove('hidden');
+      showConfetti(); // 🎊 Konfetiler otomatik başlıyor
+    }
+  }
+
+  function showConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    canvas.classList.remove('hidden');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const pieces = Array.from({ length: 150 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 5 + 5,
+      speed: Math.random() * 3 + 2,
+      color: `hsl(${Math.random() * 360}, 100%, 50%)`
+    }));
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of pieces) {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        p.y += p.speed;
+        if (p.y > canvas.height) p.y = 0;
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+</script>
+
+</body>
+</html>

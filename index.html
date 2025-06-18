@@ -161,16 +161,20 @@
     const bg = document.getElementById('bg-music');
     bg.volume = 0.3;
 
-    // Otomatik çalma engellendiğinde, ilk tıklamada başlat
-    bg.play().catch(() => {
-      function playOnUserInteraction() {
+    function startMusic() {
+      bg.play().catch(() => {
+        bg.muted = true;
         bg.play().then(() => {
-          document.body.removeEventListener('click', playOnUserInteraction);
-        }).catch(() => {});
-      }
-      document.body.addEventListener('click', playOnUserInteraction);
-    });
+          bg.muted = false;
+        });
+      });
+      document.body.removeEventListener('click', startMusic);
+    }
+
+    document.body.addEventListener('click', startMusic, { once: true });
   };
+
+
 
   const questions = [
     {

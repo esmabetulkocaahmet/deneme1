@@ -41,7 +41,6 @@
       pointer-events: none;
       z-index: 9999;
     }
-    /* Yazı animasyonu */
     @keyframes bounce {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-10px); }
@@ -56,13 +55,20 @@
 <body>
 
 <!-- 🎶 Arka Plan Müziği -->
-<audio id="bg-music" loop>
-  <source src="AUDIO/1.mp3" type="audio/mpeg">
+<audio id="bg-music" loop muted autoplay>
+  <source src="C:\Users\esmabetul\Desktop\Şeyda abla\AUDİO\1.mp3" type="audio/mpeg">
   Tarayıcınız ses etiketini desteklemiyor.
 </audio>
 
-<!-- 1. Fotoğraf/Video Slayt -->
-<section id="slideshow">
+<!-- Başlat Ekranı -->
+<section id="start">
+  <h1>🎁 Şeyda için özel bir sürpriz başlamak üzere! 🎁</h1>
+  <p style="font-size: 1.2rem;">Hazırsan başla butonuna tıkla 😊</p>
+  <button class="btn" onclick="start()">Başlat 🎶</button>
+</section>
+
+<!-- 1. Slayt -->
+<section id="slideshow" class="hidden">
   <h1>🎈 İyi ki doğdun Şeyda! 🎈</h1>
   <div class="gallery">
     <img src="images/1.jpg" class="slide">
@@ -79,7 +85,7 @@
   </div>
 </section>
 
-<!-- 2. Soru-Cevap Oyunu -->
+<!-- 2. Quiz -->
 <section id="quiz" class="hidden">
   <h2>🎁 Mini Quiz Zamanı 🎁</h2>
   <div id="question">Soru burada olacak</div>
@@ -87,18 +93,30 @@
   <button class="btn" onclick="nextQuestion()">Sonraki Soru</button>
 </section>
 
-<!-- 3. Doğum Günü Finali -->
+<!-- 3. Final -->
 <section id="final" class="hidden">
   <h1>🎉 İyi ki Doğdun Şeyda! 🎉</h1>
   <p style="font-size: 1.5rem;">Seni çok seviyoruz! Nice mutlu yaşlara 💖</p>
 </section>
 
-<!-- Konfeti Canvas -->
+<!-- Konfeti -->
 <canvas class="confetti hidden" id="confetti-canvas"></canvas>
 
 <script>
   let slides = document.querySelectorAll('.slide');
   let currentSlide = 0;
+
+  function start() {
+    document.getElementById('start').classList.add('hidden');
+    document.getElementById('slideshow').classList.remove('hidden');
+
+    const bg = document.getElementById('bg-music');
+    bg.muted = false;
+    bg.volume = 0.3;
+    bg.play().catch(e => console.log("Ses başlatılamadı:", e));
+
+    startSlideshow();
+  }
 
   function showSlide(index) {
     slides.forEach((slide, i) => {
@@ -155,16 +173,6 @@
     advance();
   }
 
-  window.onload = () => {
-    startSlideshow();
-    // Arka plan müziğini oynatmayı garantile
-    const bg = document.getElementById('bg-music');
-    bg.volume = 0.3;
-    bg.play().catch(() => {
-      document.body.addEventListener('click', () => bg.play(), { once: true });
-    });
-  }
-
   const questions = [
     {
       question: "Şeyda'nın en sevdiği tatlı nedir?",
@@ -215,7 +223,6 @@
       document.getElementById('final').classList.remove('hidden');
       showConfetti();
 
-      // Arka plan müziğini durdur
       const bg = document.getElementById('bg-music');
       if (!bg.paused) {
         bg.pause();

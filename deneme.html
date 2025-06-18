@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ses Testi</title>
+</head>
+<body>
+  <h1>🎧 Arka Plan Müzik Testi</h1>
+  <p>Ses durumu: <span id="status">Hazır</span></p>
+  <button onclick="playMusic()">Müziği Başlat 🎶</button>
+
+  <audio id="bg-music">
+    <source src="C:\Users\esmabetul\Desktop\Şeyda abla\AUDİO\1.mp3" type="audio/mpeg">
+    Tarayıcınız ses etiketini desteklemiyor.
+  </audio>
+
+  <script>
+    function playMusic() {
+      const audio = document.getElementById("bg-music");
+      const status = document.getElementById("status");
+      audio.volume = 0.5;
+
+      audio.play().then(() => {
+        status.textContent = "✅ Müzik başarıyla başladı!";
+        console.log("Müzik çalıyor.");
+      }).catch(error => {
+        status.textContent = "❌ Müzik başlatılamadı: " + error.message;
+        console.error("Müzik hatası:", error);
+      });
+    }
+  </script>
+</body>
+</html>
